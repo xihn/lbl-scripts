@@ -29,7 +29,7 @@ function check_nodes() {
     gres_info=$(echo "$node_info" | grep -oP "Gres=gpu:\K\w+:\d+")
 
     # Sanity check for CPU values
-    if ! [[ "$CPUEfctv" -eq "$CPUTot" && "$CPUEfctv" -eq "$CfgTRES_cpu" ]]; then
+    if ! [[ "$CPUEfctv" == "$CPUTot" && "$CPUEfctv" == "$CfgTRES_cpu" ]]; then
       echo "Warning: There is an issue with $node - CPU values do not match!"
       continue
     fi
@@ -56,6 +56,7 @@ function check_nodes() {
 # Check if partition is valid
 if [[ -n "$partition_name" ]]; then
   nodes=$(sinfo -p $partition_name -o "%N" --noheader)
+  IFS=',' read -r -a nodes <<< "$nodes_csv"
   if [[ -z "$nodes" ]]; then
     echo "Error: Partition $partition_name does not exist"
     exit 1
@@ -63,6 +64,7 @@ if [[ -n "$partition_name" ]]; then
 else
   # Default to all nodes if no partition specified
   nodes=$(sinfo -o "%N" --noheader)
+  IFS=',' read -r -a nodes <<< "$nodes_csv"
 fi
 
 # Check nodes and populate associative array
