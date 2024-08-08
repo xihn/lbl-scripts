@@ -26,7 +26,7 @@ function check_nodes() {
     CPUEfctv=$(echo "$node_info" | grep -oP 'CPUEfctv=\K\d+')
     CPUTot=$(echo "$node_info" | grep -oP 'CPUTot=\K\d+')
     CfgTRES_cpu=$(echo "$node_info" | grep -oP 'CfgTRES=cpu=\K\d+')
-    gres_info=$(echo "$node_info" | grep -E "Gres=")
+    gres_info=$(echo "$node_info" | grep -oP "Gres=gpu:\K\w+:\d+")
 
     # Sanity check for CPU values
     if ! [[ "$CPUEfctv" -eq "$CPUTot" && "$CPUEfctv" -eq "$CfgTRES_cpu" ]]; then
