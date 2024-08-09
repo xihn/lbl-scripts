@@ -5,18 +5,16 @@ if [[ -z "$nodes" ]]; then
 fi
 
 
-  for node in "${nodes[@]}"; do
-    node_info=$(scontrol show node $node)
+for node in "${nodes[@]}"; do
+node_info=$(scontrol show node $node)
 
-    # Extract values for sanity check
-    CPUEfctv=$(echo "$node_info" | grep -oP 'CPUEfctv=\K\d+')
-    CPUTot=$(echo "$node_info" | grep -oP 'CPUTot=\K\d+')
-    CfgTRES_cpu=$(echo "$node_info" | grep -oP 'CfgTRES=cpu=\K\d+')
-    gres_info=$(echo "$node_info" | grep -E "Gres=")
+# Extract values for sanity check
+CPUEfctv=$(echo "$node_info" | grep -oP 'CPUEfctv=\K\d+')
+CPUTot=$(echo "$node_info" | grep -oP 'CPUTot=\K\d+')
+CfgTRES_cpu=$(echo "$node_info" | grep -oP 'CfgTRES=cpu=\K\d+')
+gres_info=$(echo "$node_info" | grep -E "Gres=")
 
-    echo $gres_info
-    echo $CfgTRES_cpu
-    echo $CPUTot
-    echo $CPUEfctv
-
-    
+echo $gres_info
+echo $CfgTRES_cpu
+echo $CPUTot
+echo $CPUEfctv
