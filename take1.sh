@@ -1,14 +1,28 @@
 #!/bin/bash
 
-# Function to check node information
-function check_nodes() {
-  local nodes=$1
-  declare -A node_associative
+# Parse command line arguments
+while getopts "p:o:" opt; do
+  case ${opt} in
+    p ) partition_name=$OPTARG ;;
+    o ) output_file=$OPTARG ;;
+    \? ) echo "Invalid option: -$OPTARG" 1>&2; exit 1 ;;
+    : ) echo "Invalid option: -$OPTARG requires an argument" 1>&2; exit 1 ;;
+  esac
+done
 
-  for node in $nodes; do
+# Define default values
+node_prefix="n"
+
+# Declare associative array to store node information
+declare -A node_associative
+
+function check_nodes() {
+  local nodes=("$@")
+  
+  for node in "${nodes[@]}"; do
     node_info=$(scontrol show node $node)
-    
-    # Extract CPU information
+
+    # Extract values for sanity check
     CPUEfctv=$(echo "$node_info" | grep -oP 'CPUEfctv=\K\d+')
     CPUTot=$(echo "$node_info" | grep -oP 'CPUTot=\K\d+')
     CfgTRES_cpu=$(echo "$node_info" | grep -oP 'CfgTRES=cpu=\K\d+')
@@ -16,79 +30,55 @@ function check_nodes() {
 
     # Sanity check for CPU values
     if ! [[ "$CPUEfctv" -eq "$CPUTot" && "$CPUEfctv" -eq "$CfgTRES_cpu" ]]; then
-      echo "Warning: There is an issue with $node: CPU values mismatch"
-      continue  # Skip this iteration
+      echo "Warning: There is an issue with $node - CPU values do not match!"
+      continue
     fi
 
     # Check if Gres is null
     if [[ $gres_info == *"Gres=(null)"* ]]; then
       echo "Warning: No GPUs available on node $node"
-      continue  # Skip this iteration
+      continue
     else
       # Extract GPU type and count
       gpu_type=$(echo $gres_info | sed -n 's/.*gpu:\(.*\):[0-9]*/\1/p')
       gpu_count=$(echo $gres_info | awk -F ":" '{print $3}')
 
+      # Compute Cores per GPU
+      cores_per_gpu=$(echo "scale=1; $CPUEfctv / $gpu_count" | bc)
+
       # Add to associative array
-      node_associative[$node]="${gpu_type},${gpu_count},${CPUTot}"
+      key="$gpu_count x $gpu_type, $CPUEfctv CPU Cores, $cores_per_gpu Cores per GPU"
+      node_associative["$key"]+="$node "
     fi
   done
-
-  # Output unique combinations and their counts
-  echo "Unique combinations:"
-  for entry in "${node_associative[@]}"; do
-    echo "$entry"
-  done | sort | uniq -c
 }
 
-# Parse command line arguments
-while getopts "p:n:o:" opt; do
-  case ${opt} in
-    p)
-      partition_name=$OPTARG
-      ;;
-    n)
-      node_range=$OPTARG
-      ;;
-    o)
-      output_file=$OPTARG
-      ;;
-    \?)
-      echo "Usage: $0 [-p partition_name] [-n node_range] [-o output_file]"
-      exit 1
-      ;;
-  esac
-done
-shift $((OPTIND -1))
-
-# Validate partition and node range
-if [[ -n $partition_name ]]; then
+# Check if partition is valid
+if [[ -n "$partition_name" ]]; then
   nodes=$(sinfo -p $partition_name -o "%N" --noheader)
+  if [[ -z "$nodes" ]]; then
+    echo "Error: Partition $partition_name does not exist"
+    exit 1
+  fi
 else
+  # Default to all nodes if no partition specified
   nodes=$(sinfo -o "%N" --noheader)
 fi
 
-if [[ -n $node_range ]]; then
-  # Validate node range
-  if ! [[ $node_range =~ ^[0-9]+:[0-9]+$ ]]; then
-    echo "Invalid node range format. Use start:end, e.g., 0:15."
-    exit 1
-  fi
+# Check nodes and populate associative array
+check_nodes $nodes
 
-  start_node=$(echo $node_range | cut -d: -f1)
-  end_node=$(echo $node_range | cut -d: -f2)
-  
-  if (( start_node > end_node )); then
-    echo "Invalid node range: start node is greater than end node."
-    exit 1
-  fi
-
-  nodes=$(echo "$nodes" | grep -E "$node_prefix[0-9]{4}.$partition_name" | awk -v start="$start_node" -v end="$end_node" '{print $0}' | grep -E "n($(seq -f "%04g" $start $end))")
+# Output results to console or file
+output_target="/dev/stdout"
+if [[ -n "$output_file" ]]; then
+  output_target="$output_file"
 fi
 
-# Handle output redirection
-if [[ -n $output_file ]]; then
-  check_nodes "$nodes" > "$output_file"
-else
-  check_nodes "$nodes"
-fi
+# Print results
+{
+  for config in "${!node_associative[@]}"; do
+    echo "Configuration: $config"
+    echo "Nodes: ${node_associative[$config]}"
+    echo
+  done
+} > "$output_target"
