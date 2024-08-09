@@ -1,17 +1,13 @@
 #!/bin/bash
 
 # Parse command line arguments
-while getopts "p:o:" opt; do
+while getopts "p:" opt; do
   case ${opt} in
     p ) partition_name=$OPTARG ;;
-    o ) output_file=$OPTARG ;;
     \? ) echo "Invalid option: -$OPTARG" 1>&2; exit 1 ;;
     : ) echo "Invalid option: -$OPTARG requires an argument" 1>&2; exit 1 ;;
   esac
 done
-
-# Define default values
-node_prefix="n"
 
 # Declare associative array to store node information
 declare -A node_associative
@@ -68,17 +64,8 @@ fi
 # Check nodes and populate associative array
 check_nodes $nodes
 
-# Output results to console or file
-output_target="/dev/stdout"
-if [[ -n "$output_file" ]]; then
-  output_target="$output_file"
-fi
-
-# Print results
-{
-  for config in "${!node_associative[@]}"; do
+for config in "${!node_associative[@]}"; do
     echo "Configuration: $config"
     echo "Nodes: ${node_associative[$config]}"
     echo
   done
-} > "$output_target"
