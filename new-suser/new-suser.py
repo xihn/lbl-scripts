@@ -70,7 +70,7 @@ def set_general_partition(cluster, account, qos, partition):
         "etna": "normal",
         "dirac1": "normal",
         "hep": "hep_normal",
-        "ood_inter": "lr_interactive",
+        "ood_inter": "lr_interactive"
     }
     if partition in partition_map:
         qos = partition_map[partition]
@@ -121,6 +121,8 @@ def main():
 
     if len(sys.argv) != 4:
         print("Usage: new-suser.py username cluster account")
+        print("Account = clustername, account =  ac_|clustername|lr_|scs ")
+        print("lr3 and lr4 clustername is just lawrencium")
         sys.exit(1)
 
     if cluster == "lawrencium":

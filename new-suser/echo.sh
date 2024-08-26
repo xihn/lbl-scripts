@@ -21,7 +21,6 @@ if [ $# -ne 3 ] ; then
 fi
 
 
-filename="out.txt"
 
 
 check_and_add_slurm_user() {
@@ -76,7 +75,7 @@ check_and_add_slurm_user() {
   else
     echo User $username: does not exist
     echo "going to add user $username to partition $PART with qos  $QOS"
-    echo -e "/usr/bin/sacctmgr -i  add  user Name=$username  Partition=$PART  QOS=$QOS Account=$ACCOUNT AdminLevel=None" >> $filename
+    echo -e "/usr/bin/sacctmgr -i  add  user Name=$username  Partition=$PART  QOS=$QOS Account=$ACCOUNT AdminLevel=None"
   fi
 }
 
@@ -182,12 +181,12 @@ check_account() {
     if [[ $first_2_char == "pc" ]]; then
       PC_SU=`grep $ACCOUNT /global/home/groups/allhands/etc/pca.conf|cut -d"|" -f3`
       if [[ -z $PC_SU ]]; then
-        echo -e "/usr/bin/sacctmgr modify account where name=$ACCOUNT set GrpTRESMins="cpu=18000000" qos="lr_debug,lr_normal"" >> $filename
+        echo -e "/usr/bin/sacctmgr modify account where name=$ACCOUNT set GrpTRESMins="cpu=18000000" qos="lr_debug,lr_normal""
       else
-        echo -e "/usr/bin/sacctmgr modify account where name=$ACCOUNT set GrpTRESMins="cpu=$PC_SU" qos="lr_debug,lr_normal"" >> $filename
+        echo -e "/usr/bin/sacctmgr modify account where name=$ACCOUNT set GrpTRESMins="cpu=$PC_SU" qos="lr_debug,lr_normal""
       fi
     else
-      echo -e "/usr/bin/sacctmgr create account name=$ACCOUNT Description="$ACCOUNT cluster" Org="$ACCOUNT"" >> $filename
+      echo -e "/usr/bin/sacctmgr create account name=$ACCOUNT Description="$ACCOUNT cluster" Org="$ACCOUNT""
     fi
   fi
 }
@@ -334,84 +333,84 @@ if [ ${CLUSTER} = "lawrencium" ] ; then
       ## TODO: What are we doing with lr_bigmem and this need to be documented  - JBS
       MANYCORE_LRC="lr_bigmem";
       for LR_PART in $MANYCORE_LRC; do
-        echo -e "/usr/bin/sacctmgr -i modify user where name=$username account=$ACCOUNT partition=$LR_PART set qos=lr_normal,lr_debug" >> $filename
+        echo -e "/usr/bin/sacctmgr -i modify user where name=$username account=$ACCOUNT partition=$LR_PART set qos=lr_normal,lr_debug"
       done
       if [ "${ACCOUNT}" = "pc_heptheory" ]; then
         check_account $ACCOUNT
-        echo -e "/usr/bin/sacctmgr -i add user $username  account=$ACCOUNT qos=lr_interactive partition=lr3_htc   # for the htc testbed" >> $filename
+        echo -e "/usr/bin/sacctmgr -i add user $username  account=$ACCOUNT qos=lr_interactive partition=lr3_htc   # for the htc testbed"
       fi
       ;;
 
     lr)
       if [ "${ACCOUNT}" == "lr_cumulus" ]; then
         check_account $ACCOUNT
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=condo_cumulus" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=condo_cumulus_lr6   # condo for David Romps" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=condo_cumulus"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=condo_cumulus_lr6   # condo for David Romps"
       elif [ "${ACCOUNT}" = "lr_mp" ] ; then
         check_account $ACCOUNT
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=condo_mp_lr2   # Condo for Kristin" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=cf1 qos=condo_mp_cf1   # Condo for Kristin" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=cf1-hp qos=condo_mp_cf1   # Condo for Kristin" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_mp_es1   # Condo for Kristin" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=condo_mp_lr6   # condo for Sam Blau" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=condo_mp_lr2   # Condo for Kristin"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=cf1 qos=condo_mp_cf1   # Condo for Kristin"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=cf1-hp qos=condo_mp_cf1   # Condo for Kristin"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_mp_es1   # Condo for Kristin"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=condo_mp_lr6   # condo for Sam Blau"
       ## Condo for Krinith
       elif [ "${ACCOUNT}" = "lr_chandra" ] ; then
         check_account $ACCOUNT
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_chandra_es1" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_192 qos=condo_chandra_lr6" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_chandra_es1"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_192 qos=condo_chandra_lr6"
       ## Condo for Teresa Head-Gordon
       elif [ "${ACCOUNT}" = "lr_ninjaone" ] ; then
         check_account $ACCOUNT
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=cm2 qos=condo_ninjaone_cm2" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_192 qos=condo_ninjaone" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_share qos=condo_ninjaone_share" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_ninjaone_es1" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=cm2 qos=condo_ninjaone_cm2"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_192 qos=condo_ninjaone"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_share qos=condo_ninjaone_share"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_ninjaone_es1"
 
       elif [ "${ACCOUNT}" = "lr_amos" ] ; then
         check_account $ACCOUNT
         ## Robert  Lucchese/McCurdy 12 nodes
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr7 qos=condo_amos7_lr7,lr_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr7 qos=condo_amos7_lr7,lr_lowprio"
         ## Robert Lucchese  28 nodes
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_192 qos=condo_amos,lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr5 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=lr_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_192 qos=condo_amos,lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr5 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=lr_lowprio"
 
       elif [ "${ACCOUNT}" = "lr_essdata" ] ; then
         check_account $ACCOUNT
         ## Shreyas Cholia 8 nodes
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=condo_essdata_lr6,lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr5 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=lr_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=condo_essdata_lr6,lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr5 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=lr_lowprio"
 
       elif [ "${ACCOUNT}" = "lr_mhg2" ] ; then
         check_account $ACCOUNT
         ## Martin Head-Gordon  28 nodes
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr7 qos=condo_mhg_lr7,lr_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr7 qos=condo_mhg_lr7,lr_lowprio"
         ## Martin Head Gordon  18 nodes
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_192 qos=condo_mhg2,lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr5 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=lr_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=csd_lr6_192 qos=condo_mhg2,lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr5 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=lr_lowprio"
 
       elif [ "${ACCOUNT}" = "lr_rncstar" ] ; then
         check_account $ACCOUNT
         ## STAR/sPHENIX experiments @ RNC group  4 nodes
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr7 qos=condo_rncstar_lr7,lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr5 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=lr_lowprio" >> $filename
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=lr_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr7 qos=condo_rncstar_lr7,lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr6 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr5 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr4 qos=lr_lowprio"
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=lr_lowprio"
 
       elif [ "${ACCOUNT}" = "lr_nanotheory" ] ; then
         check_account $ACCOUNT
         ## David Prendergast 4 GPU Nodes: 4x A40 each (PO#7697311)
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_nanotheory_es1,es_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_nanotheory_es1,es_lowprio"
         ## David Prendergast 4 nodes
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=condo_nanotheory,lr_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=lr3 qos=condo_nanotheory,lr_lowprio"
 
       elif [ "${ACCOUNT}" = "lr_geop" ] ; then
         check_account $ACCOUNT
@@ -419,12 +418,12 @@ if [ ${CLUSTER} = "lawrencium" ] ; then
         # Nori Nakata 1 Chassis Dell C6520, 4 nodes 512GB nodes;  po_number=7721693; req#1000478231; LR7 Condo
         lowprio_partitions=$(echo lr{7..3})
         for lowprio_partition in $lowprio_partitions ; do
-          echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=${lowprio_partition} qos=lr_lowprio" >> $filename
+          echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=${lowprio_partition} qos=lr_lowprio"
         done
-        echo -e "/usr/bin/sacctmgr -i modify user $username account=$ACCOUNT partition=lr7 qos+=condo_geop_lr7" >> $filename
+        echo -e "/usr/bin/sacctmgr -i modify user $username account=$ACCOUNT partition=lr7 qos+=condo_geop_lr7"
 
         # Nori Nakata 1 ea. Gigabyte GPU node, 4 x A40 GPU; po_number=7734064; req#1000478254; ES1 Condo
-        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_geop_es1,es_lowprio" >> $filename
+        echo -e "/usr/bin/sacctmgr -i create user $username account=$ACCOUNT partition=es1 qos=condo_geop_es1,es_lowprio"
 
       else
         set_condo_partition $ACCOUNT
