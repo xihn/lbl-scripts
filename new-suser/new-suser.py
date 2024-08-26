@@ -19,7 +19,7 @@ def check_and_add_slurm_user(username, cluster, account, partition, qos, filenam
     account_type = account.split('_')[0]
     if account_type == "lr" and cluster not in ["lawrencium", "ood_inter"]:
         print("All condo accounts lr_ named ones should be given Lawrencium as the cluster name")
-        print("Please reenter your input as {username} lawrencium {account}")
+        print(f"Please reenter your input as {username} lawrencium {account}")
         sys.exit(1)
 
     # Override GROUP for vulcan and etna partitions
@@ -30,7 +30,7 @@ def check_and_add_slurm_user(username, cluster, account, partition, qos, filenam
     _, return_code = run_command(f"getent group {group} | grep {username}")
     if return_code != 0:
         print(f"{username} does not belong to this account {group}")
-        print("This user will not be added to slurm on {cluster} until the problem is fixed")
+        print(f"This user will not be added to slurm on {cluster} until the problem is fixed")
         sys.exit(10)
 
     # Check if the user exists in the slurm database and has the correct partition
@@ -70,7 +70,7 @@ def set_general_partition(cluster, account, qos, partition):
         "etna": "normal",
         "dirac1": "normal",
         "hep": "hep_normal",
-        "ood_inter": "lr_interactive"
+        "ood_inter": "lr_interactive",
     }
     if partition in partition_map:
         qos = partition_map[partition]
@@ -82,6 +82,30 @@ def set_general_partition(cluster, account, qos, partition):
         sys.exit(1)
     
     return part, qos
+
+def set_condo_partition(account):
+    """Sets QOS and partition for special accounts."""
+    condo_map = {
+        "lr_esd2": ("condo_esd2", "lr6"),
+        "lr_oppie": ("condo_oppie", "lr6"),
+        "lr_omega": ("condo_omega", "lr6"),
+        "lr_alsu": ("condo_alsu", "lr6"),
+        "lr_co2seq": ("condo_co2seq", "lr4"),
+        "lr_esd1": ("condo_esd1", "lr3"),
+        "lr_axl": ("condo_axl", "lr3"),
+        "lr_nokomis": ("condo_nokomis", "lr3"),
+        "lr_jgicloud": ("condo_jgicloud", "lr3"),
+        "lr_minnehaha": ("condo_minnehaha", "lr4"),
+        "lr_matminer": ("condo_matminer", "lr4"),
+        "lr_ceder": ("condo_ceder", "lr5"),
+        "lr_qchem": ("condo_qchem", "cm1"),
+        "lr_neugroup": ("condo_neugroup", "csd_lr6_96"),
+        "lr_fstheory": ("condo_fstheory", "csd_lr6_192"),
+        "lr_statmech": ("condo_statmech", "csd_lr6_96"),
+        "lr_farea": ("condo_farea", "lr6"),
+        "lr_tns": ("condo_tns", "lr6")
+    }
+    return condo_map.get(account, (None, None))
 
 def check_account(account, filename):
     """Checks if the account exists in the slurm database."""
@@ -121,8 +145,6 @@ def main():
 
     if len(sys.argv) != 4:
         print("Usage: new-suser.py username cluster account")
-        print("Account = clustername, account =  ac_|clustername|lr_|scs ")
-        print("lr3 and lr4 clustername is just lawrencium")
         sys.exit(1)
 
     if cluster == "lawrencium":
@@ -139,8 +161,13 @@ def main():
                 with open(filename, 'a') as f:
                     f.write(f"/usr/bin/sacctmgr -i add user {username} account={account} qos=lr_interactive partition=lr3_htc\n")
         elif first_2_char == "lr":
-            check_account(account, filename)
-            check_and_add_slurm_user(username, cluster, account, partition="lr3", qos="normal", filename=filename)
+            qos, partition = set_condo_partition(account)
+            if qos and partition:
+                check_account(account, filename)
+                check_and_add_slurm_user(username, cluster, account, partition, qos, filename)
+            else:
+                print("No special condo partition found. Exiting.")
+                sys.exit(10)
         else:
             print("Accounts for Lawrencium or Mako must begin with ac_, lr_, ld_, pc_ or scs.")
             sys.exit(10)
@@ -154,8 +181,13 @@ def main():
                 check_account(account, filename)
                 check_and_add_slurm_user(username, cluster, account, partition, qos, filename)
         elif first_2_char == "lr":
-            check_account(account, filename)
-            check_and_add_slurm_user(username, cluster, account, partition="cf1", qos="normal", filename=filename)
+            qos, partition = set_condo_partition(account)
+            if qos and partition:
+                check_account(account, filename)
+                check_and_add_slurm_user(username, cluster, account, partition, qos, filename)
+            else:
+                print("No special condo partition found. Exiting.")
+                sys.exit(10)
         else:
             print("Accounts for Californium must begin with ac_, lr_, ld_, pc_ or scs.")
             sys.exit(10)
