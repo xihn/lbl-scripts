@@ -41,7 +41,7 @@ def check_and_add_slurm_user(username, cluster, account, partition, qos, filenam
         print(f"User {username} does not exist")
         print(f"Going to add user {username} to partition {partition} with qos {qos}")
         with open(filename, 'a') as f:
-            f.write(f"/usr/bin/sacctmgr -i add user Name={username} Partition={partition} QOS={qos} Account={account} AdminLevel=None\n")
+            run_command(f"/usr/bin/sacctmgr -i add user Name={username} Partition={partition} QOS={qos} Account={account} AdminLevel=None\n")
 
 def set_general_partition(cluster, account, qos, partition):
     """Sets up the qos and partition for the user to be added."""
@@ -122,13 +122,13 @@ def check_account(account, filename):
             pc_su = pc_su_output.strip()
             if not pc_su:
                 with open(filename, 'a') as f:
-                    f.write(f"/usr/bin/sacctmgr modify account where name={account} set GrpTRESMins=cpu=18000000 qos=lr_debug,lr_normal\n")
+                    run_command(f"/usr/bin/sacctmgr modify account where name={account} set GrpTRESMins=cpu=18000000 qos=lr_debug,lr_normal\n")
             else:
                 with open(filename, 'a') as f:
-                    f.write(f"/usr/bin/sacctmgr modify account where name={account} set GrpTRESMins=cpu={pc_su} qos=lr_debug,lr_normal\n")
+                    run_command(f"/usr/bin/sacctmgr modify account where name={account} set GrpTRESMins=cpu={pc_su} qos=lr_debug,lr_normal\n")
         else:
             with open(filename, 'a') as f:
-                f.write(f"/usr/bin/sacctmgr create account name={account} Description={account} cluster Org={account}\n")
+                run_command(f"/usr/bin/sacctmgr create account name={account} Description={account} cluster Org={account}\n")
 
 def main():
     parser = argparse.ArgumentParser(description="Add a user to the slurm database.")
@@ -159,7 +159,7 @@ def main():
             if account == "pc_heptheory":
                 check_account(account, filename)
                 with open(filename, 'a') as f:
-                    f.write(f"/usr/bin/sacctmgr -i add user {username} account={account} qos=lr_interactive partition=lr3_htc\n")
+                    run_command(f"/usr/bin/sacctmgr -i add user {username} account={account} qos=lr_interactive partition=lr3_htc\n")
         elif first_2_char == "lr":
             qos, partition = set_condo_partition(account)
             if qos and partition:
