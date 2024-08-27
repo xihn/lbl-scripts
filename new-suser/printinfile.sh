@@ -21,7 +21,7 @@ if [ $# -ne 3 ] ; then
 fi
 
 
-filename="out.txt"
+filename="bash.txt"
 
 
 check_and_add_slurm_user() {

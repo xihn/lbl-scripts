@@ -3,6 +3,7 @@ import subprocess
 import sys
 
 default_QOS = 'normal'
+filename = 'python.txt'
 
 # Mapping account: PART , we assume QOS is condo_{username}
 QOS_map_condo = {
@@ -130,11 +131,9 @@ QOS_map_weird = {
     "ood_inter": ("ood_inter", ["lr_interactive"]),
 }
 
-def exec_command(string):
-    "Executes a shell command without returning anything"
-    subprocess.run(string, shell=True)
-    # print("\033[31m" + string + "\033[0m")
-
+def write_line(string):
+    with open(filename, 'a') as f:
+        f.write(string + "\n")
 
 def run_command(command):
     "Runs a shell command and returns the output and return code."
@@ -174,7 +173,7 @@ def add_user(username, account, cluster, partition, qos):
     else: 
         print(f"User {username} does not exist")
         print(f"Going to add user {username} to partition {partition} with qos {qos}")
-        exec_command(f"/usr/bin/sacctmgr -i add user Name={username} Partition={partition} QOS={qos} Account={account} AdminLevel=None")
+        write_line(f"/usr/bin/sacctmgr -i add user Name={username} Partition={partition} QOS={qos} Account={account} AdminLevel=None")
     
 def get_QOS_partition(cluster, account):
     "Returns the partition and QOS list as a touple"
@@ -211,11 +210,11 @@ def check_account(account):
             pc_su_output, _ = run_command(f"grep {account} /global/home/groups/allhands/etc/pca.conf | cut -d'|' -f3")
             pc_su = pc_su_output.strip()
             if not pc_su:
-                exec_command(f"/usr/bin/sacctmgr modify account where name={account} set GrpTRESMins=cpu=18000000 qos=lr_debug,lr_normal")
+                write_line(f"/usr/bin/sacctmgr modify account where name={account} set GrpTRESMins=cpu=18000000 qos=lr_debug,lr_normal")
             else:
-                exec_command(f"/usr/bin/sacctmgr modify account where name={account} set GrpTRESMins=cpu={pc_su} qos=lr_debug,lr_normal")
+                write_line(f"/usr/bin/sacctmgr modify account where name={account} set GrpTRESMins=cpu={pc_su} qos=lr_debug,lr_normal")
         else:
-            exec_command(f"/usr/bin/sacctmgr create account name={account} Description={account} cluster Org={account}")
+            write_line(f"/usr/bin/sacctmgr create account name={account} Description={account} cluster Org={account}")
 
 def qos_format(lst):
     return ','.join(lst)
@@ -243,10 +242,10 @@ def main():
                 temppart, tempqos = get_QOS_partition(i, account)
                 check_account(account)
                 add_user(username, account, cluster, temppart, qos_format(tempqos))
-            exec_command(f"/usr/bin/sacctmgr -i modify user where name={username} account={account} partition=lr_bigmem set qos=lr_normal,lr_debug")
+            write_line(f"/usr/bin/sacctmgr -i modify user where name={username} account={account} partition=lr_bigmem set qos=lr_normal,lr_debug")
             if account == "pc_heptheory":
                 check_account(account)
-                exec_command(f"/usr/bin/sacctmgr -i add user {username}  account={account} qos=lr_interactive partition=lr3_htc")
+                write_line(f"/usr/bin/sacctmgr -i add user {username}  account={account} qos=lr_interactive partition=lr3_htc")
         
         elif first_2_char == "lr":
             if account in lr_map:
@@ -254,7 +253,7 @@ def main():
                 tempargs = lr_map[account]
 
                 for i in tempargs:
-                    exec_command(f"/usr/bin/sacctmgr -i create user {username} account={account} " + i)
+                    write_line(f"/usr/bin/sacctmgr -i create user {username} account={account} " + i)
             else:
                 if account in QOS_map_condo:
                     condopart = QOS_map_condo[account]
