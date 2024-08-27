@@ -234,7 +234,8 @@ def main():
 
     first_2_char = account.split('_')[0]
 
-
+    # if python >= 3.10 could have used match and case. 
+    # match cluster: case "lawrencium" 
     if cluster == "lawrencium":
         if first_2_char in ["ac","scs","ld","pc"]: 
             print(f"{account} is ok")
