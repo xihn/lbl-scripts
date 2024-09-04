@@ -6,12 +6,15 @@ if [ -z "$1" ]; then
         exit 1
 fi
 
-echo "Checking Partition: $1"
+BLUE="\e[94m"
+BOLDBLUE="\e[1;94m"
+NC="\e[0m"
 
+echo -e "Checking Partition: ${BOLDBLUE}$1${NC}"
 
 nodes=$(sinfo -p $1 -o "%N" --noheader)
 if [[ -z "$nodes" ]]; then
-    echo "Error: Partition $partition_name does not exist"
+    echo -e "Error: Partition ${BOLDBLUE}$partition_name${NC} does not exist"
     exit 1
 fi
 IFS=',' read -r -a nodes <<< "$nodes"
@@ -38,7 +41,7 @@ if ! [[ "$CPUEfctv" -eq "$CPUTot" && "$CPUEfctv" -eq "$CfgTRES_cpu" ]]; then
     fi
 
 if [[ $gres_info == *"Gres=(null)"* ]]; then
-      echo "Warning: No GPUs available on node $node"
+      echo -e "Warning: No GPUs available on node ${BLUE}$node${NC}"
       continue
     else
       # Extract GPU type and count
@@ -58,7 +61,7 @@ done
 echo $node_associative
 
 for config in "${!node_associative[@]}"; do
-    echo "Configuration: $config"
+    echo -e "Configuration: ${BLUE}$config${NC}"
     echo "Nodes: ${node_associative[$config]}"
     echo
 done
