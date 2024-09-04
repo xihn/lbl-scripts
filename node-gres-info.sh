@@ -30,10 +30,6 @@ CPUTot=$(echo "$node_info" | grep -oP 'CPUTot=\K\d+')
 CfgTRES_cpu=$(echo "$node_info" | grep -oP 'CfgTRES=cpu=\K\d+')
 gres_info=$(echo "$node_info" | grep -E "Gres=")
 
-# echo $gres_info" -< Gres \n"
-# echo $CfgTRES_cpu"-< Total TRES \n"
-# echo $CPUTot" -< Total 2 \n"
-# echo $CPUEfctv"-< Total 3 \n"
 
 if ! [[ "$CPUEfctv" -eq "$CPUTot" && "$CPUEfctv" -eq "$CfgTRES_cpu" ]]; then
       echo "Warning: There is an issue with $node - CPU values do not match!"
