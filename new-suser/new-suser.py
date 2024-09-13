@@ -4,7 +4,7 @@ import sys
 
 default_QOS = 'normal'
 
-# Mapping account: PART , we assume QOS is condo_{username}
+# Mapping account->PART , we assume QOS is condo_{username} ex. condo_omega
 QOS_map_condo = {
     "lr_esd2": "lr6",
     "lr_oppie": "lr6",
@@ -26,7 +26,7 @@ QOS_map_condo = {
     "lr_tns": "lr6"
 }
 
-# Maps account: "command suffix" . this is a mess, but its better than before... 
+# Maps account: "command ->suffix" . this is a mess, but its better than before... 
 lr_map = {
     "lr_cumulus": [
         "partition=lr4 qos=condo_cumulus", 
@@ -93,7 +93,7 @@ lr_map = {
         ]
 }
 
-# partition: [QOS]
+# partition -> [QOS]
 QOS_map_main = {
     "lr3": ["lr_debug", "lr_normal", "lr_lowprio"],
     "lr4": ["lr_debug", "lr_normal", "lr_lowprio"],
@@ -120,7 +120,7 @@ QOS_map_main = {
     "etna_bigmem": [default_QOS]
 }
 
-# partition: ("PART", [QOS])
+# partition -> ("PART", [QOS])
 QOS_map_weird = {
     "catamount": ("catamount", ["cm_short", "cm_medium", "cm_long,cm_debug"]),
     "baldur": ("baldur1", [default_QOS]),

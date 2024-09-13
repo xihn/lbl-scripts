@@ -57,7 +57,9 @@ done
 echo $node_associative
 
 for config in "${!node_associative[@]}"; do
+    node_count=$(echo "${node_associative[$config]}" | wc -w)
     echo -e "Configuration: ${BLUE}$config${NC}"
     echo "Nodes: ${node_associative[$config]}"
+    echo "Count: $node_count"
     echo
 done
