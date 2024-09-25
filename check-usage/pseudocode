@@ -1,0 +1,21 @@
+get usage via
+
+for ACCOUNT in allaccounts
+
+sacctmgr list user WithAssoc format=User,Account,DefaultAccount -P | grep '|ACCOUNT|' | sort | uniq
+
+    new sorted hashmap
+    for user in this list:
+        create new text file / email for PI's = [account]_nousage_list
+
+
+        ./check_usage.sh -u user -time 1year
+        add username, usage to hashmap
+    
+    sort hashmap
+    generate email to send to PI sorted
+
+
+
+// there should be a few account_list files now for all inactive users on accounts  
+

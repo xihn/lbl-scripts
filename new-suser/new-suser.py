@@ -11,7 +11,7 @@ QOS_map_condo = {
     "lr_omega": "lr6",
     "lr_alsu": "lr6",
     "lr_co2seq": "lr4",
-    "lr_esd1": "lr3",
+    "lr_esd1": "lr3", # Peter Lau 36 nodes
     "lr_axl": "lr3",
     "lr_nokomis": "lr3",
     "lr_jgicloud": "lr3",
@@ -126,8 +126,8 @@ QOS_map_weird = {
     "baldur": ("baldur1", [default_QOS]),
     "nano": ("nano1", [default_QOS, "nano_debug"]),
     "dirac1": ("dirac1", [default_QOS]),
-    "hep": ("hep0", ["hep_normal"]),
-    "ood_inter": ("ood_inter", ["lr_interactive"]),
+    "hep": ("hep0", ["hep_normal"])
+    #"ood_inter": ("ood_inter", ["lr_interactive"]),
 }
 
 def exec_command(string):
