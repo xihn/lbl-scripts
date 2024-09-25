@@ -4,26 +4,27 @@ import sys
 
 default_QOS = 'normal'
 
-# Mapping account->PART , we assume QOS is condo_{username} ex. condo_omega
+# Mapping account->PART , we assume QOS is condo_{username} ex. lr_omega is condo_omega
+                                    # comments below are imported from old bash script
 QOS_map_condo = {
-    "lr_esd2": "lr6",
-    "lr_oppie": "lr6",
-    "lr_omega": "lr6",
-    "lr_alsu": "lr6",
-    "lr_co2seq": "lr4",
-    "lr_esd1": "lr3", # Peter Lau 36 nodes
-    "lr_axl": "lr3",
-    "lr_nokomis": "lr3",
-    "lr_jgicloud": "lr3",
-    "lr_minnehaha": "lr4",
-    "lr_matminer": "lr4",
-    "lr_ceder": "lr5",
-    "lr_qchem": "cm1",
-    "lr_neugroup": "csd_lr6_96",
-    "lr_fstheory": "csd_lr6_192",
-    "lr_statmech": "csd_lr6_96",
-    "lr_farea": "lr6",
-    "lr_tns": "lr6"
+    "lr_esd2": "lr6",               # Peter Lau  16 nodes
+    "lr_oppie": "lr6",              # Joel Moore 12 nodes
+    "lr_omega": "lr6",              # Mark Asta 12 nodes
+    "lr_alsu": "lr6",               # Thorsten Hellert 4 nodes
+    "lr_co2seq": "lr4",             # Michael Commer Moved from lr2 to lr4 32 nodes
+    "lr_esd1": "lr3",               # Peter Lau 36 nodes
+    "lr_axl": "lr3",                # Robert Lucchese 30 nodes
+    "lr_nokomis": "lr3",            # Jeff Neaton 40 nodes
+    "lr_jgicloud": "lr3",           # Kjiersten Fagnan 40 nodes
+    "lr_minnehaha": "lr4",          # Jeff Neaton 36 nodes
+    "lr_matminer": "lr4",           # Anubhav Jain  4 nodes
+    "lr_ceder": "lr5",              # Gerbrand Ceder 44 nodes
+    "lr_qchem": "cm1",              # Martin Head-Gordon 14 nodes
+    "lr_neugroup": "csd_lr6_96",    # Eric Neuscamman 22 nodes
+    "lr_fstheory": "csd_lr6_192",   # David Prendergast  18 nodes
+    "lr_statmech": "csd_lr6_96",    # Phil Geissler  22 nodes
+    "lr_farea": "lr6",              # Haruko Wainwright  4 nodes
+    "lr_tns": "lr6"                 # Michael Zaletel
 }
 
 # Maps account: "command ->suffix" . this is a mess, but its better than before... 
