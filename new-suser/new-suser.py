@@ -121,7 +121,7 @@ QOS_map_main = {
 }
 
 # partition -> ("PART", [QOS])
-QOS_map_weird = {
+QOS_map_standalone = {
     "catamount": ("catamount", ["cm_short", "cm_medium", "cm_long,cm_debug"]),
     "baldur": ("baldur1", [default_QOS]),
     "nano": ("nano1", [default_QOS, "nano_debug"]),
@@ -189,8 +189,8 @@ def get_QOS_partition(cluster, account):
         else:
             return (cluster, QOS_map_main[cluster])
     
-    elif cluster in QOS_map_weird:
-        return QOS_map_weird[cluster]
+    elif cluster in QOS_map_standalone:
+        return QOS_map_standalone[cluster]
     else:
         print("Partition name is not valid.")
         print("Valid ones are:")
